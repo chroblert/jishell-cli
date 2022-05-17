@@ -3,7 +3,9 @@
 本项目参考[spf13/cobra-cli](https://github.com/spf13/cobra-cli)进行开发，主要用于辅助用户创建jishell应用。
 
 # 使用
-需要先`go mod init <mod name>`
+1. 下载`jishell-cli`
+   - `go get github.com/chroblert/jishell-cli`
+2. `go mod init <mod name>`
 ## 创建app
 `jishell-cli init [--package <package name>]`
 > - 若不使用flag，则在当前目录创建main.go,app.go及cmd文件

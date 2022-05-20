@@ -13,8 +13,13 @@
 > 
 > 
 ## 添加命令
-`jishell-cli add [-p <parent command>] <sub command>`
+`jishell-cli add [-p <parent command path>] <sub command>`
 > 新建一个子命令
 > - `<parent command>`格式为：自cmd(不包括)开始的命令路径。如：`s1/xx2`
 > - 若不传入flag，则在cmd目录下创建一个名为`<sub command>`的.go文件
 > - 若传入flag，则在指定的命令路径下创建一个名为`<sub command>`的.go文件
+
+支持`jishell-cli add info/scan/portscan`格式
+
+注：
+> 使用-p，则`<sub command>`中不能带有`/`

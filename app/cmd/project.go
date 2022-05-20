@@ -80,6 +80,10 @@ func (p *Project) Create() error {
 }
 
 func (c *Command) Create() error {
+	//jlog.Error(fmt.Sprintf("%s/%s.go",c.CmdPath,c.CmdName))
+	if _, err2 := os.Stat(fmt.Sprintf("%s/%s.go", c.CmdPath, c.CmdName)); os.IsExist(err2) {
+		return nil
+	}
 	cmdFile, err := os.Create(fmt.Sprintf("%s/%s.go", c.CmdPath, c.CmdName))
 	if err != nil {
 		return err

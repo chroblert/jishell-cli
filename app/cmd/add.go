@@ -30,13 +30,13 @@ var addCmd = &jishell.Command{
 		if len(commandArg) == 0 {
 			return fmt.Errorf("请输入subCommand")
 		}
-		wd, err := os.Getwd()
+		workDir, err := os.Getwd()
 		if err != nil {
 			return err
 		}
 		commandName := validateCmdName(commandArg)
 		cmdParent := c.Flags.String("parent")
-		cmdPathList := filepath.SplitList(wd)
+		cmdPathList := filepath.SplitList(workDir)
 		cmdPathList = append(cmdPathList, "cmd")
 		cmdPathList = append(cmdPathList, strings.Split(cmdParent, "/")...)
 		cmdTplPrefix := ""
@@ -44,8 +44,12 @@ var addCmd = &jishell.Command{
 		modName := getModImportPath()
 		cmdPkgName := ""
 		if len(cmdParent) > 0 {
+			if strings.ContainsRune(commandName, '/') {
+				return fmt.Errorf("使用了-p,参数路径中请勿包含'/'")
+			}
 			cmdTplPrefix = strings.Join(strings.Split(cmdParent, "/"), "_")
 			cmdImportNamePrefix = modName + "/cmd/" + cmdParent
+			workDir += "/cmd/" + cmdParent
 			if strings.ContainsRune(cmdParent, '/') {
 				cmdPkgName = cmdParent[strings.LastIndexByte(cmdParent, '/')+1:]
 			} else {
@@ -54,12 +58,77 @@ var addCmd = &jishell.Command{
 		} else {
 			cmdImportNamePrefix = modName + "/cmd"
 			cmdPkgName = "cmd"
+			// command arg中出现了/，进行多级创建
+			commandNameList := strings.Split(commandName, "/")
+			if len(commandNameList) > 1 {
+				for _, v := range commandNameList {
+					if len(v) == 0 {
+						return fmt.Errorf("路径参数不合规")
+					}
+				}
+				// 依次创建目录
+				//cmdPathList = filepath.SplitList(workDir)
+				//cmdPathList = append(cmdPathList, "cmd")
+				cmdParent = ""
+				var absolutePath = ""
+				for k, v := range commandNameList {
+					//jlog.Error(k,"==============")
+					//cmdPathList = filepath.SplitList(workDir)
+					//jlog.Error("cmdPathList1:",cmdPathList)
+					//cmdPathList = append(cmdPathList, "cmd")
+					//jlog.Error("cmdPathList2:",cmdPathList)
+					if k == 0 {
+						cmdParent = ""
+						cmdPkgName = "cmd"
+						cmdTplPrefix = ""
+						absolutePath = workDir + "/cmd"
+					} else if k == 1 {
+						cmdParent = commandNameList[0]
+						cmdPkgName = commandNameList[0]
+						cmdTplPrefix = strings.Join(strings.Split(cmdParent, "/"), "_")
+						absolutePath = workDir + "/cmd/" + cmdParent
+					} else {
+						//jlog.Error(cmdParent,commandNameList[k-1])
+						cmdParent = cmdParent + "/" + commandNameList[k-1]
+						//jlog.Warn(cmdParent)
+						cmdPkgName = commandNameList[k-1]
+						cmdTplPrefix = strings.Join(strings.Split(cmdParent, "/"), "_")
+						absolutePath = workDir + "/cmd/" + cmdParent
+					}
+					//jlog.Error("absolutePath:",absolutePath)
+					cmdPathList = filepath.SplitList(absolutePath)
+					if len(cmdParent) == 0 {
+						cmdImportNamePrefix = modName + "/cmd"
+					} else {
+						cmdImportNamePrefix = modName + "/cmd/" + cmdParent
+					}
+					//jlog.Error("cmdParent:",cmdParent,"cmdPathList:",cmdPathList)
+					//cmdPathList = append(cmdPathList, strings.Split(cmdParent, "/")...)
+					commandName = v
+					//jlog.Warn("cmdPathList:",cmdPathList)
+					command := &Command{
+						CmdName:             commandName,
+						CmdParent:           cmdParent,
+						CmdParentHandled:    strings.Join(strings.Split(cmdParent, "/"), "_"),
+						CmdPath:             filepath.Join(cmdPathList...),
+						CmdTplPrefix:        cmdTplPrefix,
+						CmdImportNamePrefix: cmdImportNamePrefix,
+						CmdPkgName:          cmdPkgName,
+						Project: &Project{
+							AbsolutePath: absolutePath,
+							Viper:        false,
+						},
+					}
+					err = command.Create()
+					if err != nil {
+						return err
+					}
+					jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
+				}
+				return nil
+			}
+
 		}
-		//jlog.Info("cmdParent:",cmdParent)
-		//jlog.Info("modName:",modName)
-		//jlog.Info("cmdTplPrefix:",cmdTplPrefix)
-		//jlog.Info("cmdImportNamePrefix:",cmdImportNamePrefix)
-		//jlog.Info(cmdImportNamePrefix)
 		command := &Command{
 			CmdName:             commandName,
 			CmdParent:           cmdParent,
@@ -69,7 +138,7 @@ var addCmd = &jishell.Command{
 			CmdImportNamePrefix: cmdImportNamePrefix,
 			CmdPkgName:          cmdPkgName,
 			Project: &Project{
-				AbsolutePath: wd,
+				AbsolutePath: workDir,
 				Viper:        false,
 			},
 		}
@@ -77,7 +146,7 @@ var addCmd = &jishell.Command{
 		if err != nil {
 			return err
 		}
-		jlog.NInfof("%s created at %s\n", command.CmdName, command.AbsolutePath)
+		jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
 		return nil
 	},
 	Completer: nil,

@@ -39,7 +39,6 @@ var App = jishell.New(&jishell.Config{
 	HelpHeadlineUnderline: false,
 	HelpSubCommands:       false,
 	HelpHeadlineColor:     nil,
-	CurrentCommand:        "{{ .AppName2 }}",
 })
 
 func init() {
@@ -79,12 +78,9 @@ var {{ .CmdName }}Cmd = &jishell.Command{
 		return nil
 	},
 	Completer: nil,
-	CMDPath:   "cmd",
 }
 
 func init(){
-	
-	
 	var tmpCommands []*jishell.Command
 	{{ if .CmdParent }}// 如果该命令有子命令，则进行加载
 	if viper.Get("{{ .CmdTplPrefix }}_{{ .CmdName }}Commands") != nil{

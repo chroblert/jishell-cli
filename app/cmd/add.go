@@ -120,10 +120,13 @@ var addCmd = &jishell.Command{
 						},
 					}
 					err = command.Create()
-					if err != nil {
+					if err != nil && strings.HasSuffix(err.Error(), ".go文件已存在") {
+						jlog.NWarn(err.Error())
+					} else if err != nil {
 						return err
+					} else {
+						jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
 					}
-					jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
 				}
 				return nil
 			}
@@ -143,10 +146,13 @@ var addCmd = &jishell.Command{
 			},
 		}
 		err = command.Create()
-		if err != nil {
+		if err != nil && strings.HasSuffix(err.Error(), ".go文件已存在") {
+			jlog.NWarn(err.Error())
+		} else if err != nil {
 			return err
+		} else {
+			jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
 		}
-		jlog.NWarnf("[+] %s.go created at %s\n", command.CmdName, strings.ReplaceAll(command.AbsolutePath, "\\", "/"))
 		return nil
 	},
 	Completer: nil,

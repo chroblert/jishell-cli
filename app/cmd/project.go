@@ -5,6 +5,7 @@ import (
 	"github.com/chroblert/jishell-cli/tpl"
 	"github.com/chroblert/jlog"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -81,8 +82,8 @@ func (p *Project) Create() error {
 
 func (c *Command) Create() error {
 	//jlog.Error(fmt.Sprintf("%s/%s.go",c.CmdPath,c.CmdName))
-	if _, err2 := os.Stat(fmt.Sprintf("%s/%s.go", c.CmdPath, c.CmdName)); os.IsExist(err2) {
-		return nil
+	if _, err2 := os.Stat(fmt.Sprintf("%s/%s.go", c.CmdPath, c.CmdName)); !os.IsNotExist(err2) {
+		return fmt.Errorf("[!] %s/%s.go文件已存在", strings.ReplaceAll(c.CmdPath, "\\", "/"), c.CmdName)
 	}
 	cmdFile, err := os.Create(fmt.Sprintf("%s/%s.go", c.CmdPath, c.CmdName))
 	if err != nil {

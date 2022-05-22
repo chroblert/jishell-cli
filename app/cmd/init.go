@@ -38,7 +38,6 @@ var initCmd = &jishell.Command{
 		return nil
 	},
 	Completer: nil,
-	CMDPath:   "cmd",
 }
 
 func init() {

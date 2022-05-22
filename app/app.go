@@ -23,7 +23,6 @@ var App = jishell.New(&jishell.Config{
 	HelpHeadlineUnderline: false,
 	HelpSubCommands:       false,
 	HelpHeadlineColor:     nil,
-	CurrentCommand:        "jishell",
 })
 
 func init() {

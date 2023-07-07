@@ -22,4 +22,5 @@
 支持`jishell-cli add info/scan/portscan`格式
 
 注：
-> 使用-p，则`<sub command>`中不能带有`/`
+> - 使用-p，则`<sub command>`中不能带有`/`
+> - 需要与cmd目录处于同一个目录下，才能运行

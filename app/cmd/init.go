@@ -42,6 +42,13 @@ var initCmd = &jishell.Command{
 
 func init() {
 	var tmpCommands []*jishell.Command
+	// 如果该命令有子命令，则进行加载
+	if viper.Get("cm1Commands") != nil {
+		for _, subCmd := range viper.Get("cm1Commands").([]*jishell.Command) {
+			initCmd.AddCommand(subCmd)
+		}
+	}
+	// 被父命令加载
 	if viper.Get("jCommands") == nil {
 		tmpCommands = make([]*jishell.Command, 0)
 	} else {

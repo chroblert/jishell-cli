@@ -2,12 +2,19 @@ package tpl
 
 func MainTemplate() []byte {
 	return []byte(`/*
+Author: jerrybird
 */
 package main
 
-import "github.com/chroblert/jishell"
+import (
+	"github.com/chroblert/jishell"
+	"github.com/chroblert/jlog"
+)
 
 func main() {
+	defer func() {
+		jlog.Flush()
+	}()
 	jishell.Main(App)
 }
 `)

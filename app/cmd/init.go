@@ -119,7 +119,7 @@ func parseModInfo() (Mod, CurDir) {
 
 	// Unsure why, but if no module is present Path is set to this string.
 	if mod.Path == "command-line-arguments" {
-		jlog.Fatal("Please run `go mod init <MODNAME>` before `cobra-cli init`")
+		jlog.Fatal("Please run `go mod init <MODNAME>` before `jishell-cli init`")
 	}
 
 	e := modInfoJSON("-e")
